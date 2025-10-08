@@ -1,46 +1,6 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 
-let authors = [
-  {
-    name: 'Robert Martin',
-    id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
-    born: 1952,
-  },
-  {
-    name: 'Martin Fowler',
-    id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
-    born: 1963
-  },
-  {
-    name: 'Fyodor Dostoevsky',
-    id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
-    born: 1821
-  },
-  { 
-    name: 'Joshua Kerievsky', // birthyear not known
-    id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
-  },
-  { 
-    name: 'Sandi Metz', // birthyear not known
-    id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
-  },
-]
-
-/*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
- * Spanish:
- * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
- * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conexión con el libro
-*/
-
 let books = [
   {
     title: 'Clean Code',
@@ -93,6 +53,63 @@ let books = [
   },
 ]
 
+function countBooksAuthor(name, books){
+  let count = 0
+  for (let i = 0; i < books.length; i++) {
+    if (books[i].author === name) {
+      count = count + 1
+    }
+  }
+  return count
+}
+
+let authors = [
+  {
+    name: 'Robert Martin',
+    id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
+    born: 1952,
+    bookCount: countBooksAuthor('Robert Martin', books)
+  },
+  {
+    name: 'Martin Fowler',
+    id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
+    born: 1963,
+    bookCount: countBooksAuthor('Martin Fowler', books)
+  },
+  {
+    name: 'Fyodor Dostoevsky',
+    id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
+    born: 1821,
+    bookCount: countBooksAuthor('Fyodor Dostoevsky', books)
+  },
+  { 
+    name: 'Joshua Kerievsky', // birthyear not known
+    id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
+    bookCount: countBooksAuthor('Joshua Kerievsky', books)
+  },
+  { 
+    name: 'Sandi Metz', // birthyear not known
+    id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
+    bookCount: countBooksAuthor('Sandi Metz', books)
+  },
+]
+
+/*
+ * Suomi:
+ * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
+ * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
+ *
+ * English:
+ * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
+ * However, for simplicity, we will store the author's name in connection with the book
+ *
+ * Spanish:
+ * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
+ * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conexión con el libro
+*/
+
+
+
 /*
   you can remove the placeholder query once your first one has been implemented 
 */
@@ -106,10 +123,19 @@ const typeDefs = `
     id: ID!
     genres: [String!]!
   }
+  
+  type Author {
+    name: String!
+    id: ID!
+    born: Int!
+    bookCount: Int!
+  }
+
   type Query {
     bookCount: Int!
     authorCount: Int!,
     allBooks: [Book!]!
+    allAuthors: [Author!]!
   }
 `
 
@@ -117,7 +143,8 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    allBooks: () => books
+    allBooks: () => books,
+    allAuthors: () => authors 
   }
 }
 
