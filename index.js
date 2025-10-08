@@ -94,6 +94,7 @@ let authors = [
   },
 ]
 
+
 /*
  * Suomi:
  * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
@@ -133,7 +134,7 @@ const typeDefs = `
   type Query {
     bookCount: Int!
     authorCount: Int!,
-    allBooks(author: String!): [Book!]!
+    allBooks(author: String!, genre: [String!]!): [Book!]!
     allAuthors: [Author!]!
   }
 `
@@ -142,7 +143,7 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    allBooks: (roots, args) => books.filter(b => b.author === args.author),
+    allBooks: (roots, args) => books.filter((b) => (b.author === args.author) && b.genres.includes('refactoring') ),
     allAuthors: () => authors 
   }
 }
