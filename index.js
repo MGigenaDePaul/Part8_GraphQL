@@ -135,14 +135,6 @@ const typeDefs = `
   }
 `
 
-// addAuthor(
-//       name: String!
-//       id: ID!
-//       born: Int!
-//       bookCount: Int!
-//     ): Author
-//   }
-
 const resolvers = {
   Query: {
     bookCount: () => books.length,
@@ -176,6 +168,7 @@ const resolvers = {
         let newAuthor = {
           name: book.author,
           born: null,
+          id: uuid(),
           bookCount: 1
         }
         authors = authors.concat(newAuthor)
