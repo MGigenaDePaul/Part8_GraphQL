@@ -1,5 +1,7 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
+const { v1: uuid } = require('uuid')
+const { GraphQLError } = require('graphql')
 
 let books = [
   {
@@ -94,32 +96,17 @@ let authors = [
   },
 ]
 
-
 /*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
  * Spanish:
  * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
  * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conexión con el libro
-*/
-
-
-
-/*
-  you can remove the placeholder query once your first one has been implemented 
 */
 
 const typeDefs = `
   type Author {
     name: String!
     id: ID!
-    born: Int!
+    born: Int
     bookCount: Int!
   }
 
@@ -131,6 +118,15 @@ const typeDefs = `
     genres: [String!]!
   }
 
+  type Mutation {
+    addBook(
+      title: String!
+      author: String!
+      published: Int!
+      genres: [String!]!
+    ): Book
+  }
+
   type Query {
     bookCount: Int!
     authorCount: Int!,
@@ -139,12 +135,61 @@ const typeDefs = `
   }
 `
 
+// addAuthor(
+//       name: String!
+//       id: ID!
+//       born: Int!
+//       bookCount: Int!
+//     ): Author
+//   }
+
 const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
     allBooks: (roots, args) => books.filter((b) => (b.author === args.author) && b.genres.includes('refactoring') ),
-    allAuthors: () => authors 
+    allAuthors: (roots, args) => authors
+  },
+
+  Mutation: {
+    addBook: (roots, args) => {
+      if (books.find(b => b.title === args.title)) {
+        throw new GraphQLError('Title must be unique', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title
+          }
+        })
+      }
+
+      const book = { ...args, id: uuid()}
+
+      // if author exists, find it's index and update it's bookCount property
+      const index = authors.findIndex(a => a.name === book.author)
+
+      if (index !== -1) {
+        authors[index].bookCount += 1
+      }
+
+      // if author doesn't exist, create a new one
+      if (index === -1) {
+        let newAuthor = {
+          name: book.author,
+          born: null,
+          bookCount: 1
+        }
+        authors = authors.concat(newAuthor)
+      }
+
+      books = books.concat(book)
+
+      console.log('BOOKS', books)
+      console.log('AUTHORS', authors)
+      console.log('books Martin Fowler:', countBooksAuthor('Martin Fowler', books))
+      console.log('books Reijo Mäki:', countBooksAuthor('Reijo Mäki', books))
+
+      return book
+    }
   }
 }
 
