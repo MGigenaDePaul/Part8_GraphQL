@@ -125,6 +125,8 @@ const typeDefs = `
       published: Int!
       genres: [String!]!
     ): Book
+
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 
   type Query {
@@ -182,6 +184,19 @@ const resolvers = {
       console.log('books Reijo Mäki:', countBooksAuthor('Reijo Mäki', books))
 
       return book
+    },
+
+    editAuthor: (roots, args) => {
+      const author = authors.find(a => a.name === args.name)
+      if (!author) {
+        return null
+      }
+      
+      const updatedAuthor = {...author, born: args.setBornTo}
+      authors = authors.map(a => a.name === args.name ? updatedAuthor : a)
+
+      console.log('AUTHORS UPDATED', authors)
+      return updatedAuthor
     }
   }
 }
