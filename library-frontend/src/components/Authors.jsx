@@ -9,7 +9,7 @@ const Authors = ({authors}) => {
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
 
-  if (!authors){
+  if (!authors) {
     return null
   }
 
@@ -46,10 +46,13 @@ const Authors = ({authors}) => {
       </table>
       <h2>Set BirthYear</h2>
       <form onSubmit={submit}>
-        <div>
-          name:
-          <input value={name} onChange={(event) => setName(event.target.value)}/>
-        </div>
+        <select style={{width: 300, padding: 5 }}value={name} onChange={(event) => setName(event.target.value)}>
+          <option>Robert Martin</option>
+          <option>Martin Fowler</option>
+          <option>Fyodor Dostoevsky</option>
+          <option>Joshua Kerievsky</option>
+          <option>Sandi Metz</option>
+        </select>
         <div>
           born:
           <input value={born} onChange={(event) => setBorn(event.target.value)}/>
