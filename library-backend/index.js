@@ -60,25 +60,26 @@ const resolvers = {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
     allBooks: async (roots, args) => {
-      let filter = {}
       if (args.author) {
         const author = await Author.findOne({ name: args.name })
         if (author) {
-          filter.author = author._id
-          console.log('filter.author', filter.author)
+          return Book.find({ author: author._id }).populate('author')
         } else {
           return []
         }
       }
 
-      if (args.genre){
-        filter.genres = { $in: args.genre }
-        console.log('filter.genres', filter.genres)
+      if (args.genre) {
+        return Book.find({ genres: { $in: args.genre } }).populate('author')
       }
 
-      return Book.find(filter).populate('author')
+      return Book.find({}).populate('author')
     },
-    allAuthors: (roots, args) => authors
+    allAuthors: async(roots, args) => {
+      if (!args.name) {
+        return Author.find({})
+      }
+    }
   },
 
   Mutation: {
@@ -97,7 +98,7 @@ const resolvers = {
         throw new GraphQLError('Saving book failed', {
           extensions: {
             code: 'BAD_USER_INPUT',
-            invalidArgs: args.title,
+            invalidArgs: [args.title, args.name],
             error
           }
         })
@@ -105,17 +106,22 @@ const resolvers = {
       return book.populate('author')
     },
 
-    editAuthor: (roots, args) => {
-      const author = authors.find(a => a.name === args.name)
-      if (!author) {
-        return null
-      }
+    editAuthor: async (roots, args) => {
+      const author = await Author.findOne({ name: args.name })
+      author.born = args.setBornTo
       
-      const updatedAuthor = {...author, born: args.setBornTo}
-      authors = authors.map(a => a.name === args.name ? updatedAuthor : a)
-
-      console.log('AUTHORS UPDATED', authors)
-      return updatedAuthor
+      try {
+        await author.save()
+      } catch (error) {
+        throw new GraphQLError('Editing author born failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.setBornTo,
+            error
+          }
+        })
+      }
+      return author
     }
   }
 }
