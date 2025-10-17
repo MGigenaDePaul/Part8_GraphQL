@@ -2,6 +2,9 @@ const Books = ({books}) => {
   // if (!props.show) {
   //   return null
   // }
+  if (!books) {
+    return null
+  }
 
   return (
     <div>

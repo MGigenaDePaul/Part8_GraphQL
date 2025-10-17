@@ -36,10 +36,9 @@ const Authors = ({authors}) => {
             <th>books</th>
           </tr>
           {authors.allAuthors.map((a) => (
-            <tr key={a.name}>
+            <tr key={a}>
               <td>{a.name}</td>
               <td>{a.born}</td>
-              <td>{a.bookCount}</td>
             </tr>
           ))}
         </tbody>
@@ -47,11 +46,10 @@ const Authors = ({authors}) => {
       <h2>Set BirthYear</h2>
       <form onSubmit={submit}>
         <select style={{width: 300, padding: 5 }}value={name} onChange={(event) => setName(event.target.value)}>
-          <option>Robert Martin</option>
-          <option>Martin Fowler</option>
-          <option>Fyodor Dostoevsky</option>
-          <option>Joshua Kerievsky</option>
-          <option>Sandi Metz</option>
+          {authors.allAuthors.map((a) => 
+            <option key={a.id}>{a.name}</option>
+          )
+          }
         </select>
         <div>
           born:

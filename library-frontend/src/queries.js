@@ -5,7 +5,6 @@ query {
   allAuthors {
     name
     born
-    bookCount
   }
 }
 `

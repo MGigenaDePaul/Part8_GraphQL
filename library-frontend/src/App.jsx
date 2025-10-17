@@ -23,14 +23,15 @@ const App = () => {
 
   return (
     <div>
-      <Link style={padding} to="/authors">
-        <button> authors </button></Link>
-      <Link style={padding} to="/books">
-        <button> books </button>
-      </Link>
-      <Link style={padding} to="/addBook">        
-        <button> add book </button>
-      </Link>
+        <Link style={padding} to="/authors">
+          <button> authors </button></Link>
+        <Link style={padding} to="/books">
+          <button> books </button>
+        </Link>
+        <Link style={padding} to="/addBook">        
+          <button> add book </button>
+        </Link>
+      
 
       <Routes>
         <Route path="/authors" 
