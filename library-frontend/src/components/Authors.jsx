@@ -3,9 +3,6 @@ import { useMutation } from "@apollo/client/react"
 import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries"
 
 const Authors = ({authors}) => {
-  // if (!show) {
-  //   return null
-  // }
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
 
@@ -36,7 +33,7 @@ const Authors = ({authors}) => {
             <th>born</th>
             <th>books</th>
           </tr>
-          {authors.allAuthors.map((a) => (
+          {authors.map((a) => (
             <tr key={a.id}>
               <td>{a.name}</td>
               <td>{a.born}</td>
@@ -46,8 +43,8 @@ const Authors = ({authors}) => {
       </table>
       <h2>Set BirthYear</h2>
       <form onSubmit={submit}>
-        <select style={{width: 300, padding: 5 }}value={name} onChange={(event) => setName(event.target.value)}>
-          {authors.allAuthors.map((a) => 
+        <select style={{width: 300, padding: 5 }} value={name} onChange={(event) => setName(event.target.value)}>
+          {authors.map((a) => 
             <option key={a.id}>{a.name}</option>)
           }
         </select>

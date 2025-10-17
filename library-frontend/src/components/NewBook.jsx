@@ -9,10 +9,6 @@ const NewBook = () => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
-  // if (!props.show) {
-  //   return null
-  // }
-
   const [createBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS}, { query: ALL_AUTHORS }]
   })

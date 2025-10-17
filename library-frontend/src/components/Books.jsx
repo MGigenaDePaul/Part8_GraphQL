@@ -1,7 +1,4 @@
 const Books = ({books}) => {
-  // if (!props.show) {
-  //   return null
-  // }
   if (!books) {
     return null
   }
@@ -17,7 +14,7 @@ const Books = ({books}) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.allBooks.map((b) => (
+          {books.map((b) => (
             <tr key={b.id}>
               <td>{b.title}</td>
               <td>{b.author.name}</td>
