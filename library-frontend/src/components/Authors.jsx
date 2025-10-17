@@ -9,6 +9,7 @@ const Authors = ({authors}) => {
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
 
+  console.log('los authors', authors)
   if (!authors) {
     return null
   }
@@ -36,7 +37,7 @@ const Authors = ({authors}) => {
             <th>books</th>
           </tr>
           {authors.allAuthors.map((a) => (
-            <tr key={a}>
+            <tr key={a.id}>
               <td>{a.name}</td>
               <td>{a.born}</td>
             </tr>
@@ -47,8 +48,7 @@ const Authors = ({authors}) => {
       <form onSubmit={submit}>
         <select style={{width: 300, padding: 5 }}value={name} onChange={(event) => setName(event.target.value)}>
           {authors.allAuthors.map((a) => 
-            <option key={a.id}>{a.name}</option>
-          )
+            <option key={a.id}>{a.name}</option>)
           }
         </select>
         <div>
