@@ -26,7 +26,6 @@ const App = () => {
   const resultBooks = useQuery(ALL_BOOKS)
   const [token, setToken] = useState(null)
   const client = useApolloClient()
-  const navigate = useNavigate()
 
   useEffect(() => {
     const savedToken = localStorage.getItem('user-token')

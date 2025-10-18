@@ -1,12 +1,38 @@
+import { useState } from 'react'
+
 const Books = ({books}) => {
+  const [booksByGenre, setBooksByGenre] = useState([])
+
   if (!books) {
     return null
   }
+  
+  const selectedGenre = (genre) => {
+    console.log('selectedGenre:', genre)
+    const showBooksByGenre = books.filter((b) => b.genres.includes(genre)) 
+    console.log('books to show', showBooksByGenre)
+    setBooksByGenre(showBooksByGenre)
+    console.log('THIS ARE THE BOOKS', booksByGenre)
+  }
+
+  // show filtered books or all of them
+  const displayBooks = booksByGenre.length > 0 ? booksByGenre : books
+
+  // Genres can repeat 
+  const genresRepeated = []
+  books.forEach(b => {
+    b.genres.forEach(g => genresRepeated.push(g))
+  })
+  console.log('genresRepeated:', genresRepeated)
+
+  // Genres can't repeat
+  const uniqueGenres = [...new Set(genresRepeated)]
+  console.log('uniqueGenres', uniqueGenres)
 
   return (
     <div>
       <h2>books</h2>
-
+      <p>Clasification of books by <b>genre</b></p>
       <table>
         <tbody>
           <tr>
@@ -14,15 +40,21 @@ const Books = ({books}) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((b) => (
+          {displayBooks.map((b) => 
             <tr key={b.id}>
               <td>{b.title}</td>
               <td>{b.author.name}</td>
               <td>{b.published}</td>
-            </tr>
-          ))}
+            </tr> 
+          )}
         </tbody>
       </table>
+      <div>
+      {uniqueGenres.map((g) => 
+        <button key={g} onClick={() => selectedGenre(g)}>{g}</button>
+      )}
+      <button onClick={() => setBooksByGenre([])}>all Genres</button>
+      </div>
     </div>
   )
 }
