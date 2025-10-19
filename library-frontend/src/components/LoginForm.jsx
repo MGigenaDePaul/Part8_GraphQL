@@ -17,7 +17,6 @@ const LoginForm = ({ setToken }) => {
   useEffect(() => {
     if (result.data) {
       const token = result.data.login.value
-      console.log('TOKEN:', token)
       setToken(token)
       localStorage.setItem('user-token', token)
       navigate('/')
@@ -39,7 +38,7 @@ const LoginForm = ({ setToken }) => {
         </div>
         <div>
             password:
-            <input value={password} onChange={(event) => setPassword(event.target.value)}/>
+            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)}/>
         </div>
         <button type="submit">login</button>
         </form>

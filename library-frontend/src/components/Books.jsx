@@ -10,24 +10,18 @@ const Books = ({books}) => {
   const selectedGenre = (genre) => {
     console.log('selectedGenre:', genre)
     const showBooksByGenre = books.filter((b) => b.genres.includes(genre)) 
-    console.log('books to show', showBooksByGenre)
     setBooksByGenre(showBooksByGenre)
-    console.log('THIS ARE THE BOOKS', booksByGenre)
   }
 
   // show filtered books or all of them
   const displayBooks = booksByGenre.length > 0 ? booksByGenre : books
 
-  // Genres can repeat 
   const genresRepeated = []
   books.forEach(b => {
     b.genres.forEach(g => genresRepeated.push(g))
   })
-  console.log('genresRepeated:', genresRepeated)
 
-  // Genres can't repeat
   const uniqueGenres = [...new Set(genresRepeated)]
-  console.log('uniqueGenres', uniqueGenres)
 
   return (
     <div>

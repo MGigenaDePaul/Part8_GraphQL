@@ -1,23 +1,51 @@
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
+import Home from "./components/Home";
 import { useState, useEffect } from 'react'
-import { Link, Routes, Route, useNavigate } from 'react-router-dom'
+import { Link, Routes, Route } from 'react-router-dom'
 import { useApolloClient, useQuery } from '@apollo/client/react'
-import { ALL_AUTHORS, ALL_BOOKS } from "./queries";
+import { ALL_AUTHORS, ALL_BOOKS, ME } from "./queries";
 import LoginForm from "./components/LoginForm";
 
-const Home = ({token}) => {
-  if (!token) {
+const RecommendView = ({token, books}) => {
+  if (!token || !books) {
     return null
   }
 
-  console.log('is there a token?', token)
+  const {data} = useQuery(ME, {
+    onError: (error) => {
+      console.log("couldn't fetch user info", error)
+    }
+  })
+
+   if (!data) return null
+
+  const favoriteGenre = data.me.favoriteGenre
+
+  const filteredBooks = books.filter((b) => b.genres.includes(favoriteGenre))
 
   return (
-    <div>
-      <h2>HOME</h2>
-    </div>
+      <div>
+        <h2>recommendations</h2>
+        <p>books in your favorite genre <b>{favoriteGenre}</b></p>
+        <table>
+          <tbody>
+            <tr>
+              <th></th>
+              <th>author</th>
+              <th>published</th>
+            </tr>
+            {filteredBooks.map(b => 
+              <tr key={b.id}>
+                <td>{b.title}</td>
+                <td>{b.author.name}</td>
+                <td>{b.published}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
   )
 }
 
@@ -39,8 +67,6 @@ const App = () => {
   }
   console.log('authors:', resultAuthors)
   console.log('books', resultBooks)
-
- 
 
   const handleLogout = () => {
     setToken(null)
@@ -65,7 +91,10 @@ const App = () => {
           <Link style={padding} to="/addBook"><button>add book</button></Link>
         )}
         {token && (
-          <Link to="/login"><button onClick={handleLogout}>logout</button></Link>
+          <Link style={padding} to="/recommend"><button>recommend</button></Link>
+        )}
+        {token && (
+          <Link style={padding} to="/login"><button onClick={handleLogout}>logout</button></Link>
         )}
         
       <Routes>
@@ -78,6 +107,10 @@ const App = () => {
         {token && (
           <Route path="/addBook" element={<NewBook books={resultBooks.data}/>} /> 
         )}
+        {token && (
+          <Route path="/recommend" element={<RecommendView token={token} books={resultBooks.data.allBooks}/>} />
+        )}
+        
       </Routes>
     </div>
   );
