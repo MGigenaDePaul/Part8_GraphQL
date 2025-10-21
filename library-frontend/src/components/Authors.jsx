@@ -6,7 +6,6 @@ const Authors = ({authors}) => {
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
 
-  console.log('los authors', authors)
   if (!authors) {
     return null
   }

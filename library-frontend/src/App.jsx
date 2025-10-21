@@ -2,51 +2,28 @@ import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import Home from "./components/Home";
+import LoginForm from "./components/LoginForm";
+import RecommendView from "./components/RecommendView";
 import { useState, useEffect } from 'react'
 import { Link, Routes, Route } from 'react-router-dom'
-import { useApolloClient, useQuery } from '@apollo/client/react'
-import { ALL_AUTHORS, ALL_BOOKS, ME } from "./queries";
-import LoginForm from "./components/LoginForm";
+import { useApolloClient, useQuery, useSubscription } from '@apollo/client/react'
+import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED } from "./queries";
 
-const RecommendView = ({token, books}) => {
-  if (!token || !books) {
-    return null
+export const updateCache = (cache, query, addedBook) => {
+   // helper that is used to eliminate saving same book twice
+  const uniqByTitle = (a) => {
+    let seen = new Set()
+    return a.filter((item) => {
+      let k = item.title
+      return seen.has(k) ? false : seen.add(k)
+    })
   }
 
-  const {data} = useQuery(ME, {
-    onError: (error) => {
-      console.log("couldn't fetch user info", error)
+  cache.updateQuery(query, ({ allBooks }) => {
+    return {
+      allBooks: uniqByTitle(allBooks.concat(addedBook)),
     }
   })
-
-   if (!data) return null
-
-  const favoriteGenre = data.me.favoriteGenre
-
-  const filteredBooks = books.filter((b) => b.genres.includes(favoriteGenre))
-
-  return (
-      <div>
-        <h2>recommendations</h2>
-        <p>books in your favorite genre <b>{favoriteGenre}</b></p>
-        <table>
-          <tbody>
-            <tr>
-              <th></th>
-              <th>author</th>
-              <th>published</th>
-            </tr>
-            {filteredBooks.map(b => 
-              <tr key={b.id}>
-                <td>{b.title}</td>
-                <td>{b.author.name}</td>
-                <td>{b.published}</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-  )
 }
 
 const App = () => {
@@ -54,6 +31,15 @@ const App = () => {
   const resultBooks = useQuery(ALL_BOOKS)
   const [token, setToken] = useState(null)
   const client = useApolloClient()
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({data, client}) => {
+      const addedBook = data.data.bookAdded
+      console.log('addedBook:', addedBook)
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
+      window.alert(`a new book "${addedBook.title}" added`)
+    }
+  })
 
   useEffect(() => {
     const savedToken = localStorage.getItem('user-token')
@@ -65,8 +51,8 @@ const App = () => {
   if (resultAuthors.loading || resultBooks.loading) {
     return <div>loading data...</div>
   }
-  console.log('authors:', resultAuthors)
-  console.log('books', resultBooks)
+  // console.log('authors:', resultAuthors)
+  // console.log('books', resultBooks)
 
   const handleLogout = () => {
     setToken(null)
@@ -80,6 +66,7 @@ const App = () => {
 
   return (
     <div>
+      {/*LINKS*/}
         <Link to="/"></Link>
         <Link style={padding} to="/authors">
           <button> authors </button></Link>
@@ -87,16 +74,13 @@ const App = () => {
           <button> books </button>
         </Link>
         <Link style={padding} to="/login"><button>login</button></Link>
-        {token && (
-          <Link style={padding} to="/addBook"><button>add book</button></Link>
-        )}
-        {token && (
-          <Link style={padding} to="/recommend"><button>recommend</button></Link>
-        )}
-        {token && (
-          <Link style={padding} to="/login"><button onClick={handleLogout}>logout</button></Link>
-        )}
-        
+
+        {/*User can access this functionalities if it's logged in*/}
+        {token && (<Link style={padding} to="/addBook"><button>add book</button></Link>)}
+        {token && (<Link style={padding} to="/recommend"><button>recommend</button></Link>)}
+        {token && (<Link style={padding} to="/login"><button onClick={handleLogout}>logout</button></Link>)}
+      
+      {/*ROUTES*/}
       <Routes>
         <Route path="/" element={<Home token={token} logout={handleLogout}/>}/>
         <Route path="/authors" 
@@ -110,7 +94,6 @@ const App = () => {
         {token && (
           <Route path="/recommend" element={<RecommendView token={token} books={resultBooks.data.allBooks}/>} />
         )}
-        
       </Routes>
     </div>
   );
