@@ -29,9 +29,31 @@ const resolvers = {
       return Book.find({}).populate('author')
     },
     allAuthors: async(roots, args) => {
-      if (!args.name) {
-        return Author.find({})
-      }
+      const authors = await Author.aggregate([
+        {
+          $lookup: {
+            from: 'books', // collection name in MongoDB (lowercase, plural)
+            localField: '_id',
+            foreignField: 'author',
+            as: 'books'
+          }
+        },
+        {
+          $addFields: {
+            bookCount: { $size: '$books' }
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            born: 1,
+            bookCount: 1,
+            id: '$_id' // Map _id to id for GraphQL
+          }
+        }
+      ]);
+      
+      return authors;
     }, 
     me: async (roots, args, context) => {
       return context.currentUser

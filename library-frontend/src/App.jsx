@@ -36,8 +36,8 @@ const App = () => {
     onData: ({data, client}) => {
       const addedBook = data.data.bookAdded
       console.log('addedBook:', addedBook)
-      updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
       window.alert(`a new book "${addedBook.title}" added`)
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
     }
   })
 
@@ -48,11 +48,8 @@ const App = () => {
     }
   }, []) 
 
-  if (resultAuthors.loading || resultBooks.loading) {
-    return <div>loading data...</div>
-  }
-  // console.log('authors:', resultAuthors)
-  // console.log('books', resultBooks)
+  if (!resultBooks.data) return <div>loading books...</div>
+  if (!resultAuthors.data) return <div>loading authors...</div>
 
   const handleLogout = () => {
     setToken(null)

@@ -45,9 +45,9 @@ const Books = ({books}) => {
       </table>
       <div>
       {uniqueGenres.map((g) => 
-        <button key={g} onClick={() => selectedGenre(g)}>{g}</button>
+        <button style={{padding: '5px'}} key={g} onClick={() => selectedGenre(g)}>{g}</button>
       )}
-      <button onClick={() => setBooksByGenre([])}>all Genres</button>
+      <button style={{marginLeft: '10px', padding: '5px'}} onClick={() => setBooksByGenre([])}>all Genres</button>
       </div>
     </div>
   )

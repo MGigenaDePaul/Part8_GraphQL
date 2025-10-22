@@ -21,6 +21,7 @@ query {
     name
     born
     id
+    bookCount
   }
 }
 `
