@@ -31,6 +31,7 @@ query {
     title 
     author {
       name
+      id
     }
     published 
     genres
@@ -38,6 +39,23 @@ query {
   }
 }
 `
+
+export const BOOKS_BY_GENRE = gql`
+  query AllBooks($genre: [String!]) {
+  allBooks(genre: $genre) {
+    title
+    genres
+    author{
+      name
+      born
+      id
+    }
+    published
+    id
+  }
+}
+`
+
 export const CREATE_BOOK = gql`
 mutation AddBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!) {
   addBook(title: $title, author: $author, published: $published, genres: $genres) {

@@ -29,7 +29,7 @@ const resolvers = {
       return Book.find({}).populate('author')
     },
     allAuthors: async(roots, args) => {
-      const authors = await Author.aggregate([
+      const authors = await Author.aggregate([  // from MongoDB docs
         {
           $lookup: {
             from: 'books', // collection name in MongoDB (lowercase, plural)

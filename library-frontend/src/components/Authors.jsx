@@ -10,6 +10,7 @@ const Authors = ({authors}) => {
     return null
   }
 
+  // enable editing author's birth
   const [changeBorn] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{query: ALL_AUTHORS}]
   })
